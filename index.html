@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tiff.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/tiff.js"></script>
+  </head>
+  <body>
+    <input type="file" id="file-input" accept=".tif,.tiff">
+    <button id="convert-button">Convert to JPEG</button>
+    <div id="image-container"></div>
+
+    <script>
+      var tiffImage = null;
+
+      // Load the .TIF image file and display it in the container
+      function loadTiffImage(file) {
+        Tiff.initialize({TOTAL_MEMORY: 16777216});
+        var reader = new FileReader();
+        reader.onload = function() {
+          var tiff = new Tiff({buffer: reader.result});
+          tiffImage = tiff.toCanvas();
+          document.getElementById('image-container').appendChild(tiffImage);
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      // Convert the TIF image to JPEG format and display it in the container
+      function convertToJpeg() {
+        var canvas = document.createElement('canvas');
+        canvas.width = tiffImage.width;
+        canvas.height = tiffImage.height;
+        canvas.getContext('2d').drawImage(tiffImage, 0, 0);
+        var jpegUrl = canvas.toDataURL('image/jpeg', 1.0);
+        var jpegImage = new Image();
+        jpegImage.src = jpegUrl;
+        document.getElementById('image-container').appendChild(jpegImage);
+      }
+
+      // Event listeners for file input and conversion button
+      var fileInput = document.getElementById('file-input');
+      fileInput.addEventListener('change', function() {
+        var file = fileInput.files[0];
+        loadTiffImage(file);
+      });
+
+      var convertButton = document.getElementById('convert-button');
+      convertButton.addEventListener('click', function() {
+        convertToJpeg();
+      });
+    </script>
+  </body>
+</html>
